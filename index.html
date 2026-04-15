@@ -1,532 +1,494 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --accent-color: #10b981;
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-color: #1f2937;
-            --border-color: #e5e7eb;
-        }
-
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 2rem;
-            max-width: 1000px;
-            width: 90%;
-            background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        /* 左侧：支付表单 */
-        .payment-section {
-            padding: 2rem;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-right: 10px;
-        }
-
-        .ai-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .ai-badge::before {
-            content: '✨';
-        }
-
-        h2 { margin-top: 0; }
-
-        .order-summary {
-            background: #f8fafc;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .form-group { margin-bottom: 1.5rem; }
-        
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        input[type="text"], input[type="email"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        /* 支付方式选择 */
-        .payment-methods {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 1.5rem;
-        }
-
-        .method-card {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .method-card:hover { border-color: var(--primary-color); }
-        
-        .method-card.active {
-            border-color: var(--primary-color);
-            background-color: #eff6ff;
-            box-shadow: 0 0 0 1px var(--primary-color);
-        }
-
-        .method-icon { font-size: 1.5rem; display: block; margin-bottom: 5px; }
-        .method-name { font-size: 0.8rem; font-weight: 600; }
-
-        /* AI 推荐标签 */
-        .ai-recommend {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--accent-color);
-            color: white;
-            font-size: 0.6rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .pay-button {
-            width: 100%;
-            padding: 14px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .pay-button:hover { background: var(--secondary-color); }
-
-        .pay-button:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-        }
-
-        /* 右侧：订单详情与AI助手入口 */
-        .sidebar {
-            background: #f8fafc;
-            padding: 2rem;
-            border-left: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .total-amount {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .amount {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--text-color);
-        }
-
-        .currency { font-size: 1rem; color: #6b7280; }
-
-        .ai-insight {
-            background: #e0e7ff;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: auto;
-            border: 1px solid #c7d2fe;
-        }
-
-        .ai-insight h4 {
-            margin: 0 0 0.5rem 0;
-            color: var(--secondary-color);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .ai-insight p {
-            margin: 0;
-            font-size: 0.85rem;
-            color: #3730a3;
-            line-height: 1.5;
-        }
-
-        /* 悬浮 AI Chatbot */
-        .ai-chatbot {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 350px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            display: none; /* 默认隐藏，点击按钮显示 */
-            flex-direction: column;
-            z-index: 1000;
-            border: 1px solid var(--border-color);
-        }
-
-        .chatbot-header {
-            background: var(--primary-color);
-            color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chatbot-body {
-            height: 300px;
-            padding: 15px;
-            overflow-y: auto;
-            background: #f9fafb;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .message {
-            padding: 8px 12px;
-            border-radius: 8px;
-            max-width: 80%;
-            font-size: 0.9rem;
-        }
-
-        .bot-msg {
-            background: #e5e7eb;
-            align-self: flex-start;
-            border-bottom-left-radius: 0;
-        }
-
-        .user-msg {
-            background: var(--primary-color);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 0;
-        }
-
-        .chatbot-input-area {
-            padding: 10px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: 5px;
-        }
-
-        .chatbot-input-area input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-        }
-
-        .chatbot-toggle {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-            z-index: 999;
-            transition: transform 0.2s;
-        }
-
-        .chatbot-toggle:hover { transform: scale(1.1); }
-
-        /* 响应式 */
-        @media (max-width: 768px) {
-            .container { grid-template-columns: 1fr; }
-            .sidebar { padding: 1.5rem; }
-            .payment-methods { grid-template-columns: 1fr; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --primary-color: #2563eb;
+    --secondary-color: #1e40af;
+    --accent-color: #10b981; /* 绿色 */
+    --bg-color: #f3f4f6;
+    --card-bg: #ffffff;
+    --text-color: #1f2937;
+    --border-color: #e5e7eb;
+  }
+  body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .container {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+    max-width: 1000px;
+    width: 90%;
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  /* 左侧：支付表单 */
+  .payment-section {
+    padding: 2rem;
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-right: 10px;
+  }
+  .ai-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .ai-badge::before {
+    content: '✨';
+  }
+  h2 {
+    margin-top: 0;
+  }
+  .order-summary {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+  }
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  input[type="text"],
+  input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  /* 支付方式选择 */
+  .payment-methods {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+  .method-card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative; /* 必须有定位才能让子元素absolute生效 */
+  }
+  .method-card:hover {
+    border-color: var(--primary-color);
+  }
+  .method-card.active {
+    border-color: var(--primary-color);
+    background-color: #eff6ff;
+    box-shadow: 0 0 0 1px var(--primary-color);
+  }
+  .method-icon {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 5px;
+  }
+  .method-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  /* AI 推荐标签 */
+  .ai-recommend {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--accent-color); /* 默认绿色 */
+    color: white;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  /* 特定于 "10% Off!" 的样式 */
+  .ai-recommend.discount {
+    background: #ff5722; /* 橙色 */
+  }
+  .pay-button {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+  .pay-button:hover {
+    background: var(--secondary-color);
+  }
+  .pay-button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+  }
+  /* 右侧：订单详情与AI助手入口 */
+  .sidebar {
+    background: #f8fafc;
+    padding: 2rem;
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+  }
+  .total-amount {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .amount {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--text-color);
+  }
+  .currency {
+    font-size: 1rem;
+    color: #6b7280;
+  }
+  .ai-insight {
+    background: #e0e7ff;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: auto;
+    border: 1px solid #c7d2fe;
+  }
+  .ai-insight h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .ai-insight p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #3730a3;
+    line-height: 1.5;
+  }
+  /* 悬浮 AI Chatbot */
+  .ai-chatbot {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 350px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+    border: 1px solid var(--border-color);
+  }
+  .chatbot-header {
+    background: var(--primary-color);
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chatbot-body {
+    height: 300px;
+    padding: 15px;
+    overflow-y: auto;
+    background: #f9fafb;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .message {
+    padding: 8px 12px;
+    border-radius: 8px;
+    max-width: 80%;
+    font-size: 0.9rem;
+  }
+  .bot-msg {
+    background: #e5e7eb;
+    align-self: flex-start;
+    border-bottom-left-radius: 0;
+  }
+  .user-msg {
+    background: var(--primary-color);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 0;
+  }
+  .chatbot-input-area {
+    padding: 10px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 5px;
+  }
+  .chatbot-input-area input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+  }
+  .chatbot-toggle {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    z-index: 999;
+    transition: transform 0.2s;
+  }
+  .chatbot-toggle:hover {
+    transform: scale(1.1);
+  }
+  /* 响应式 */
+  @media (max-width: 768px) {
+    .container {
+      grid-template-columns: 1fr;
+    }
+    .sidebar {
+      padding: 1.5rem;
+    }
+    .payment-methods {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
 </head>
 <body>
-
 <div class="container">
-    <!-- 左侧支付区 -->
-    <div class="payment-section">
-        <div class="header">
-            <div class="logo">PayAI</div>
-            <div class="ai-badge">AI 驱动安全支付</div>
-        </div>
-
-        <div class="order-summary">
-            <h3>订单概览</h3>
-            <p>商品：跑鞋</p>
-            <p>商户：Nike</p>
-            <p style="color: var(--accent-color); font-size: 0.9rem;">
-                <span id="ai-status">🛡️ AI 风控检测：当前环境安全</span>
-            </p>
-        </div>
-
-        <form id="payment-form">
-            <div class="form-group">
-                <label>持卡人姓名</label>
-                <input type="text" placeholder="例如：张三" required>
-            </div>
-            <div class="form-group">
-                <label>卡号</label>
-                <input type="text" placeholder="0000 0000 0000 0000" maxlength="19">
-            </div>
-            <div style="display: flex; gap: 1rem;">
-                <div class="form-group" style="flex: 1;">
-                    <label>有效期</label>
-                    <input type="text" placeholder="MM/YY" maxlength="5">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>CVV</label>
-                    <input type="text" placeholder="123" maxlength="3">
-                </div>
-            </div>
-
-            <label style="margin-top: 1rem; margin-bottom: 0.5rem;">选择支付方式</label>
-            <div class="payment-methods">
-                <div class="method-card active" onclick="selectMethod(this, 'credit')">
-                    <span class="method-icon">💳</span>
-                    <span class="method-name">信用卡</span>
-                    <div class="ai-recommend">AI 推荐</div>
-                </div>
-                <div class="method-card" onclick="selectMethod(this, 'alipay')">
-                    <span class="method-icon">🅰️</span>
-                    <span class="method-name">支付宝</span>
-                </div>
-                <div class="method-card" onclick="selectMethod(this, 'wechat')">
-                    <span class="method-icon">💬</span>
-                    <span class="method-name">微信支付</span>
-                </div>
-            </div>
-
-            <button type="submit" class="pay-button" id="pay-btn">
-                <span>立即支付 ¥999.00</span>
-                <span style="font-size: 0.8rem; opacity: 0.8;">🔒 加密</span>
-            </button>
-        </form>
+  <!-- 左侧支付区 -->
+  <div class="payment-section">
+    <div class="header">
+      <div class="logo">PayAI</div>
+      <div class="ai-badge">AI Powered Secure Payment</div>
     </div>
-
-    <!-- 右侧侧边栏 -->
-    <div class="sidebar">
-        <div class="total-amount">
-            <p class="currency">总计支付 (CNY)</p>
-            <p class="amount">¥999.00</p>
-        </div>
-        
-        <div style="margin-top: 2rem;">
-            <h4>交易详情</h4>
-            <ul style="padding-left: 20px; color: #6b7280; font-size: 0.9rem;">
-                <li>订单号：#AI-12341234</li>
-                <li>税费：已包含</li>
-                <li>汇率：1.0 (实时AI计算)</li>
-            </ul>
-        </div>
-
-        <!-- AI 智能洞察 -->
-        <div class="ai-insight">
-            <h4>✨ AI 智能分析</h4>
-            <p>根据您的历史支付习惯，使用<strong>信用卡</strong>支付成功率最高，且预计 <strong>2秒</strong> 内到账。</p>
-        </div>
+    <div class="order-summary">
+      <h3>Order Summary</h3>
+      <p>Product: Running Shoes</p>
+      <p>Merchant: Nike</p>
+      <p style="color: var(--accent-color); font-size: 0.9rem;">
+        <span id="ai-status">🛡️ AI Risk Detection: Environment Secure</span>
+      </p>
     </div>
+    <form id="payment-form">
+      <div class="form-group">
+        <label>Cardholder Name</label>
+        <input type="text" placeholder="e.g., John Doe" required>
+      </div>
+      <div class="form-group">
+        <label>Card Number</label>
+        <input type="text" placeholder="0000 0000 0000 0000" maxlength="19">
+      </div>
+      <div style="display: flex; gap: 1rem;">
+        <div class="form-group" style="flex: 1;">
+          <label>Expiry Date</label>
+          <input type="text" placeholder="MM/YY" maxlength="5">
+        </div>
+        <div class="form-group" style="flex: 1;">
+          <label>CVV</label>
+          <input type="text" placeholder="123" maxlength="3">
+        </div>
+      </div>
+      <label style="margin-top: 1rem; margin-bottom: 0.5rem;">Select Payment Method</label>
+      <div class="payment-methods">
+        <div class="method-card active" onclick="selectMethod(this, 'credit')">
+          <span class="method-icon">💳</span>
+          <span class="method-name">Credit Card</span>
+          <div class="ai-recommend">AI Rec.</div> <!-- 永久存在的标签 -->
+        </div>
+        <div class="method-card" onclick="selectMethod(this, 'alipay')">
+          <span class="method-icon">🅰️</span>
+          <span class="method-name">Alipay</span>
+          <div class="ai-recommend discount">10% Off!</div> <!-- 永久存在的标签 -->
+        </div>
+        <div class="method-card" onclick="selectMethod(this, 'wechat')">
+          <span class="method-icon">💬</span>
+          <span class="method-name">WeChat Pay</span>
+          <!-- WeChat 无标签 -->
+        </div>
+      </div>
+      <button type="submit" class="pay-button" id="pay-btn">
+        <span>Pay Now $999.00</span>
+        <span style="font-size: 0.8rem; opacity: 0.8;">🔒 Encrypted</span>
+      </button>
+    </form>
+  </div>
+  <!-- 右侧侧边栏 -->
+  <div class="sidebar">
+    <div class="total-amount">
+      <p class="currency">Total Amount (USD)</p>
+      <p class="amount">$999.00</p>
+    </div>
+    <div style="margin-top: 2rem;">
+      <h4>Transaction Details</h4>
+      <ul style="padding-left: 20px; color: #6b7280; font-size: 0.9rem;">
+        <li>Order ID: #AI-12341234</li>
+        <li>Taxes: Included</li>
+        <li>Exchange Rate: 1.0 (Real-time AI)</li>
+      </ul>
+    </div>
+    <!-- AI 智能洞察 -->
+    <div class="ai-insight">
+      <h4>✨ AI Smart Analysis</h4>
+      <p>Based on your history, <strong>Credit Card</strong> has the highest success rate and will process in <strong>2 seconds</strong>.</p>
+    </div>
+  </div>
 </div>
-
 <!-- AI Chatbot 悬浮窗 -->
 <button class="chatbot-toggle" onclick="toggleChat()">🤖</button>
-
 <div class="ai-chatbot" id="chatbot">
-    <div class="chatbot-header">
-        <span>支付助手 (AI)</span>
-        <span style="cursor: pointer;" onclick="toggleChat()">✕</span>
-    </div>
-    <div class="chatbot-body" id="chat-body">
-        <div class="message bot-msg">您好！我是您的AI支付助手。如果您在支付过程中遇到任何问题，或者有关于汇率的疑问，随时问我！</div>
-    </div>
-    <div class="chatbot-input-area">
-        <input type="text" id="chat-input" placeholder="输入您的问题..." onkeypress="handleKeyPress(event)">
-        <button style="background: var(--primary-color); color: white; border: none; padding: 0 15px; border-radius: 4px; cursor: pointer;">发送</button>
-    </div>
+  <div class="chatbot-header">
+    <span>Payment Assistant (AI)</span>
+    <span style="cursor: pointer;" onclick="toggleChat()">✕</span>
+  </div>
+  <div class="chatbot-body" id="chat-body">
+    <div class="message bot-msg">Hello! I am your AI Payment Assistant. Ask me about exchange rates or payment issues.</div>
+  </div>
+  <div class="chatbot-input-area">
+    <input type="text" id="chat-input" placeholder="Ask me anything..." onkeypress="handleKeyPress(event)">
+    <button style="background: var(--primary-color); color: white; border: none; padding: 0 15px; border-radius: 4px; cursor: pointer;">Send</button>
+  </div>
 </div>
 
 <script>
-    // 支付方式选择逻辑
-    function selectMethod(element, method) {
-        // 移除所有active类
-        document.querySelectorAll('.method-card').forEach(card => {
-            card.classList.remove('active');
-            // 移除推荐标签（模拟AI动态调整）
-            card.querySelector('.ai-recommend')?.remove();
-        });
-
-        // 添加active类到当前选中
-        element.classList.add('active');
-
-        // 模拟AI动态推荐逻辑：如果选了支付宝，AI可能会提示有优惠
-        if(method === 'alipay') {
-            const badge = document.createElement('div');
-            badge.className = 'ai-recommend';
-            badge.style.background = '#ff5722'; // 橙色
-            badge.innerText = '优惠';
-            element.appendChild(badge);
-        }
-    }
-
-    // 支付按钮模拟
-    const payBtn = document.getElementById('pay-btn');
-    payBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const originalText = payBtn.innerHTML;
-        
-        // 模拟AI处理中
-        payBtn.disabled = true;
-        payBtn.innerHTML = '🤖 AI 正在验证安全...';
-        payBtn.style.background = '#6b7280';
-
-        setTimeout(() => {
-            payBtn.innerHTML = '✅ 支付成功！';
-            payBtn.style.background = '#10b981';
-            
-            // 模拟Chatbot自动弹出提示
-            addBotMessage("检测到支付已完成，正在为您生成电子发票...");
-            toggleChat(); // 自动打开聊天框
-        }, 2000);
+  // 简化的支付方式选择逻辑
+  function selectMethod(element, method) {
+    // 移除所有卡片的 "active" 类
+    document.querySelectorAll(".method-card").forEach((card) => {
+      card.classList.remove("active");
     });
+    // 给当前点击的卡片添加 "active" 类
+    element.classList.add("active");
+    // 不再处理标签的添加或移除
+  }
 
-    // Chatbot 逻辑
-    function toggleChat() {
-        const chat = document.getElementById('chatbot');
-        chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
-    }
+  // 支付按钮模拟
+  const payBtn = document.getElementById("pay-btn");
+  payBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const originalText = payBtn.innerHTML;
+    // 模拟AI处理中
+    payBtn.disabled = true;
+    payBtn.innerHTML = "🤖 AI Verifying Security...";
+    payBtn.style.background = "#6b7280";
+    setTimeout(() => {
+      payBtn.innerHTML = "✅ Payment Successful!";
+      payBtn.style.background = "#10b981";
+      // 模拟Chatbot自动弹出提示
+      addBotMessage("Receipt generated. Thank you for your purchase!");
+      toggleChat(); // 自动打开聊天框
+    }, 2000);
+  });
 
-        function handleKeyPress(e) {
-        if (e.key === 'Enter') {
-            const input = document.getElementById('chat-input');
-            const text = input.value;
-            if(text.trim() === "") return;
+  // Chatbot 逻辑
+  function toggleChat() {
+    const chat = document.getElementById("chatbot");
+    chat.style.display = chat.style.display === "flex" ? "none" : "flex";
+  }
 
-            // 1. 添加用户消息
-            const chatBody = document.getElementById('chat-body');
-            const userDiv = document.createElement('div');
-            userDiv.className = 'message user-msg';
-            userDiv.innerText = text;
-            chatBody.appendChild(userDiv);
-
-            input.value = '';
-            chatBody.scrollTop = chatBody.scrollHeight;
-
-            // 2. 模拟 AI 思考延迟
-            setTimeout(() => {
-                let aiResponse = "";
-                const userQuery = text.toLowerCase(); // 转为小写以便匹配
-
-                // --- AI 场景模拟逻辑 ---
-                
-                // 场景 A: 关于汇率
-                if (userQuery.includes("汇率") || userQuery.includes("换算") || userQuery.includes("rate")) {
-                    aiResponse = "根据实时外汇市场数据，当前 CNY 对 USD 的汇率为 7.24。由于市场波动，最终扣款金额可能会以银行结算时的汇率为准，误差通常在 0.5% 以内。";
-                } 
-                // 场景 B: 关于支付失败
-                else if (userQuery.includes("失败") || userQuery.includes("不了") || userQuery.includes("error")) {
-                    aiResponse = "检测到支付失败可能由以下原因导致：\n1. 银行卡余额不足或已过期。\n2. 触发了我们的 AI 风控系统（如异地登录）。\n3. 发卡行暂时拒绝了该笔交易。\n建议您尝试切换至支付宝或微信支付。";
-                }
-                // 场景 C: 关于手续费
-                else if (userQuery.includes("手续费") || userQuery.includes("费用") || userQuery.includes("fee")) {
-                    aiResponse = "本平台承诺透明收费。使用信用卡支付通常由商户承担手续费，您无需额外付费；但在跨境交易中，发卡行可能会收取 1.5% 的货币转换费。";
-                }
-                // 场景 D: 默认回复
-                else {
-                    aiResponse = "这是一个演示回复。在真实环境中，我会连接大模型来回答关于“汇率”、“手续费”或“支付失败”的问题。";
-                }
-
-                addBotMessage(aiResponse);
-            }, 800); // 800ms 延迟，模拟打字感
+  function handleKeyPress(e) {
+    if (e.key === "Enter") {
+      const input = document.getElementById("chat-input");
+      const text = input.value;
+      if (text.trim() === "") return;
+      // 1. 添加用户消息
+      const chatBody = document.getElementById("chat-body");
+      const userDiv = document.createElement("div");
+      userDiv.className = "message user-msg";
+      userDiv.innerText = text;
+      chatBody.appendChild(userDiv);
+      input.value = "";
+      chatBody.scrollTop = chatBody.scrollHeight;
+      // 2. 模拟 AI 思考延迟
+      setTimeout(() => {
+        let aiResponse = "";
+        const userQuery = text.toLowerCase();
+        // --- AI 场景模拟逻辑 ---
+        // 场景 A: 关于汇率
+        if (userQuery.includes("exchange rate") || userQuery.includes("currency") || userQuery.includes("rate")) {
+          aiResponse = "The current exchange rate is dynamically calculated in real-time. Your bank may apply a slight variance (approx 0.5%) during settlement.";
         }
+        // 场景 B: 关于支付失败
+        else if (userQuery.includes("failed") || userQuery.includes("cant") || userQuery.includes("error")) {
+          aiResponse = "Payment failure reasons:\n1. Insufficient balance or expired card.\n2. Security block (e.g., login from a new location).\n3. Bank declined the transaction.\nTry switching to Credit Card.";
+        }
+        // 场景 C: 关于手续费
+        else if (userQuery.includes("fee") || userQuery.includes("charge")) {
+          aiResponse = "Transparent pricing: No extra fees for Credit Cards. For cross-border transactions, your bank may charge a 1.5% currency conversion fee.";
+        }
+        // 场景 D: 默认回复
+        else {
+          aiResponse = "This is a demo response. In a real environment, I would answer questions about 'Exchange Rates', 'Fees', or 'Failed Payments'.";
+        }
+        addBotMessage(aiResponse);
+      }, 800);
     }
+  }
 
-    function addBotMessage(text) {
-        const chatBody = document.getElementById('chat-body');
-        const botDiv = document.createElement('div');
-        botDiv.className = 'message bot-msg';
-        botDiv.innerText = text;
-        chatBody.appendChild(botDiv);
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
+  function addBotMessage(text) {
+    const chatBody = document.getElementById("chat-body");
+    const botDiv = document.createElement("div");
+    botDiv.className = "message bot-msg";
+    botDiv.innerText = text;
+    chatBody.appendChild(botDiv);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
 </script>
-
 </body>
 </html>
